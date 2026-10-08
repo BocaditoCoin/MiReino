@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mi Reino — Bocadito</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07020f; --bg2:#0d0420; --panel:#0f0820; --panel-line:#2a1554;
+  --ink:#f1ecff; --ink-dim:#a99cd6;
+  --violet:#b026ff; --violet-soft:rgba(176,38,255,.16);
+  --green:#39ff88; --green-soft:rgba(57,255,136,.14);
+  --pink:#ff2b9d; --pink-soft:rgba(255,43,157,.14);
+  --cyan:#28e2ff; --amber:#ffb020; --red:#ff3b57; --gold:#ffd24d;
+  --radius:16px; --sidebar-w:240px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*{box-sizing:inherit;}
+html,body{height:100%;}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:'Space Grotesk',system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+::selection{background:var(--violet); color:#fff;}
+::-webkit-scrollbar{width:10px; height:10px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--panel-line); border-radius:8px;}
+
+.bg-stars{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 30%, #fff8 40%, transparent 60%),
+    radial-gradient(1.5px 1.5px at 70% 15%, #fff6 40%, transparent 60%),
+    radial-gradient(1px 1px at 45% 60%, #fff5 40%, transparent 60%),
+    radial-gradient(1.5px 1.5px at 85% 70%, #fff7 40%, transparent 60%),
+    radial-gradient(1px 1px at 10% 80%, #fff5 40%, transparent 60%),
+    radial-gradient(1.5px 1.5px at 60% 85%, #fff6 40%, transparent 60%),
+    radial-gradient(1px 1px at 30% 10%, #fff5 40%, transparent 60%),
+    radial-gradient(1.5px 1.5px at 92% 40%, #fff7 40%, transparent 60%);
+  opacity:.6;
+}
+.bg-glow{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(600px 400px at 10% -5%, var(--violet-soft), transparent 60%),
+    radial-gradient(500px 350px at 100% 0%, var(--pink-soft), transparent 60%),
+    radial-gradient(700px 500px at 60% 100%, var(--green-soft), transparent 60%);
+}
+
+.shell{position:relative; z-index:1; display:flex; min-height:100vh;}
+.sidebar{
+  width:var(--sidebar-w); flex:0 0 auto; padding:22px 14px; border-right:1px solid var(--panel-line);
+  background:linear-gradient(180deg, rgba(15,8,32,.7), rgba(7,2,15,.7));
+  position:sticky; top:0; height:100vh; display:flex; flex-direction:column; gap:18px; overflow-y:auto;
+}
+.brand{text-align:center; padding:6px 0 4px;}
+.brand .crest{font-size:1.7rem; display:block; filter:drop-shadow(0 0 10px var(--violet));}
+.brand h1{
+  font-family:'Cinzel Decorative', serif; font-weight:900; margin:6px 0 0; font-size:1.5rem; line-height:1;
+  background:linear-gradient(90deg, var(--gold), var(--pink) 55%, var(--violet));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.brand small{color:var(--ink-dim); font-size:.7rem; letter-spacing:.08em;}
+
+.nav-group-label{font-size:.66rem; letter-spacing:.09em; color:var(--ink-dim); text-transform:uppercase; padding:8px 12px 2px; opacity:.7;}
+nav.nav{display:flex; flex-direction:column; gap:4px;}
+nav.nav button{
+  display:flex; align-items:center; gap:10px; background:transparent; border:1px solid transparent; color:var(--ink-dim);
+  padding:10px 12px; border-radius:11px; font-family:inherit; font-size:.87rem; text-align:left; cursor:pointer; width:100%;
+}
+nav.nav button .ic{font-size:1rem; flex:0 0 auto;}
+nav.nav button:hover{background:rgba(255,255,255,.04); color:var(--ink);}
+nav.nav button.active{
+  background:linear-gradient(90deg, var(--violet-soft), transparent); border-color:var(--panel-line); color:var(--ink);
+  font-weight:600; box-shadow:inset 3px 0 0 var(--violet);
+}
+nav.nav button.soon{opacity:.55;}
+nav.nav button .tag{margin-left:auto; font-size:.6rem; background:rgba(255,255,255,.06); padding:2px 6px; border-radius:999px; color:var(--ink-dim);}
+.side-foot{margin-top:auto; font-size:.7rem; color:var(--ink-dim); opacity:.7; text-align:center; padding-top:10px; border-top:1px solid var(--panel-line);}
+
+.main{flex:1; min-width:0; padding:26px 30px 70px;}
+@media (max-width:860px){
+  .shell{flex-direction:column;}
+  .sidebar{position:sticky; top:0; z-index:5; width:100%; height:auto; flex-direction:row; align-items:center; padding:12px 14px; gap:14px; overflow-x:auto;}
+  .brand{text-align:left; padding:0; display:flex; align-items:center; gap:8px; flex:0 0 auto;}
+  .brand .crest{font-size:1.3rem;} .brand h1{font-size:1.05rem;} .brand small{display:none;}
+  .nav-group-label{display:none;}
+  nav.nav{flex-direction:row; gap:6px;}
+  nav.nav button{white-space:nowrap; padding:8px 12px;}
+  .side-foot{display:none;}
+  .main{padding:20px 16px 60px;}
+}
+
+.view{display:none; animation:fade .35s ease both;}
+.view.active{display:block;}
+@keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+.page-head{margin-bottom:22px; display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap;}
+.page-head h2{font-family:'Cinzel Decorative', serif; font-size:1.7rem; margin:0 0 6px; color:var(--gold); text-shadow:0 0 14px rgba(255,210,77,.3);}
+.page-head p{color:var(--ink-dim); margin:0; max-width:640px; font-size:.92rem;}
+
+.kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:22px;}
+@media (max-width:760px){ .kpis{grid-template-columns:repeat(2,1fr);} }
+.kpi{background:linear-gradient(180deg, var(--panel), var(--bg2)); border:1px solid var(--panel-line); border-radius:var(--radius); padding:20px 18px; position:relative; overflow:hidden;}
+.kpi::before{content:""; position:absolute; inset:-40% -40% auto auto; width:140px; height:140px; background:radial-gradient(circle, var(--glow,var(--violet)) 0%, transparent 70%); opacity:.35; filter:blur(6px);}
+.kpi .lbl{font-size:.75rem; color:var(--ink-dim); letter-spacing:.04em;}
+.kpi .val{font-size:2rem; font-weight:700; margin-top:6px; font-variant-numeric:tabular-nums;}
+.kpi .sub{font-size:.76rem; color:var(--ink-dim); margin-top:4px;}
+.kpi.k-green{--glow:var(--green);} .kpi.k-green .val{color:var(--green);}
+.kpi.k-pink{--glow:var(--pink);} .kpi.k-pink .val{color:var(--pink);}
+.kpi.k-cyan{--glow:var(--cyan);} .kpi.k-cyan .val{color:var(--cyan);}
+.kpi.k-red{--glow:var(--red);} .kpi.k-red .val{color:var(--red);}
+.kpi.k-amber{--glow:var(--amber);} .kpi.k-amber .val{color:var(--amber);}
+
+.panel{background:linear-gradient(180deg, var(--panel), var(--bg2)); border:1px solid var(--panel-line); border-radius:var(--radius); padding:22px; margin-bottom:22px;}
+.panel h3{font-size:1.02rem; margin:0 0 4px; color:var(--ink);}
+.panel .desc{color:var(--ink-dim); font-size:.83rem; margin:0 0 16px;}
+.grid2{display:grid; grid-template-columns:1.3fr 1fr; gap:22px;}
+@media (max-width:900px){ .grid2{grid-template-columns:1fr;} }
+
+.bar-row{display:flex; align-items:center; gap:12px; margin:11px 0;}
+.bar-row .name{width:170px; flex:0 0 auto; font-size:.8rem; color:var(--ink-dim); text-align:right;}
+.bar-track{flex:1; height:13px; border-radius:8px; background:#1a0f36; overflow:hidden;}
+.bar-fill{height:100%; border-radius:8px; background:linear-gradient(90deg, var(--cyan), var(--violet)); box-shadow:0 0 10px var(--violet);}
+.bar-row .pct{width:50px; flex:0 0 auto; font-size:.8rem; font-weight:600; font-variant-numeric:tabular-nums;}
+
+.donut-wrap{display:flex; flex-direction:column; align-items:center; gap:14px;}
+.donut-legend{display:flex; flex-wrap:wrap; gap:8px 14px; justify-content:center; font-size:.74rem; color:var(--ink-dim);}
+.donut-legend span.sw{display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:6px; vertical-align:middle;}
+
+.alert-grid{display:grid; grid-template-columns:1fr 1fr; gap:22px;}
+@media (max-width:820px){ .alert-grid{grid-template-columns:1fr;} }
+.alert-list{list-style:none; margin:0; padding:0;}
+.alert-list li{display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-radius:10px; margin-bottom:8px; background:rgba(255,255,255,.02); border:1px solid var(--panel-line);}
+.alert-list li .nm{font-size:.88rem;}
+.alert-list li .nm .cat{display:block; font-size:.68rem; color:var(--ink-dim); margin-top:2px;}
+.badge{padding:3px 10px; border-radius:999px; font-size:.76rem; font-weight:700; font-variant-numeric:tabular-nums;}
+.badge.bad{background:rgba(255,59,87,.15); color:var(--red); border:1px solid rgba(255,59,87,.4);}
+.badge.good{background:rgba(57,255,136,.15); color:var(--green); border:1px solid rgba(57,255,136,.4);}
+
+.card-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(210px,1fr)); gap:16px;}
+.cat-card{background:linear-gradient(180deg, var(--panel), var(--bg2)); border:1px solid var(--panel-line); border-radius:14px; padding:18px; cursor:pointer; text-align:left; color:var(--ink); font-family:inherit; position:relative; overflow:hidden;}
+.cat-card:hover{border-color:var(--violet);}
+.cat-card .n{font-size:.72rem; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.05em;}
+.cat-card h4{margin:6px 0 12px; font-size:1.02rem;}
+.cat-card .stat{display:flex; justify-content:space-between; font-size:.8rem; color:var(--ink-dim); margin-top:4px;}
+.cat-card .stat b{color:var(--ink); font-variant-numeric:tabular-nums;}
+.cat-card .fcbar{height:6px; border-radius:4px; background:#1a0f36; margin-top:10px; overflow:hidden;}
+.cat-card .fcbar i{display:block; height:100%; border-radius:4px;}
+
+.controls{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;}
+.controls input, .controls select{background:#150a2e; border:1px solid var(--panel-line); color:var(--ink); padding:9px 12px; border-radius:10px; font-family:inherit; font-size:.86rem; outline:none;}
+.controls input{flex:1; min-width:180px;}
+.controls input:focus, .controls select:focus{border-color:var(--violet); box-shadow:0 0 0 3px var(--violet-soft);}
+.table-scroll{overflow-x:auto; border-radius:12px; border:1px solid var(--panel-line);}
+table{width:100%; border-collapse:collapse; font-size:.85rem; min-width:600px;}
+thead th{text-align:left; padding:11px 14px; background:#150a2e; color:var(--ink-dim); font-weight:600; font-size:.72rem; letter-spacing:.04em; text-transform:uppercase; position:sticky; top:0; cursor:pointer; user-select:none; white-space:nowrap;}
+thead th:hover{color:var(--ink);}
+thead th.nosort{cursor:default;}
+tbody td{padding:10px 14px; border-top:1px solid var(--panel-line); white-space:nowrap;}
+tbody tr:hover{background:rgba(176,38,255,.06);}
+td.num{font-variant-numeric:tabular-nums; text-align:right;}
+.chip{font-size:.68rem; padding:2px 8px; border-radius:999px; border:1px solid var(--panel-line); color:var(--ink-dim);}
+.fc-dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:7px; vertical-align:middle;}
+.pending{color:var(--amber); font-style:italic; font-size:.78rem;}
+
+.note-box{border:1px dashed var(--panel-line); border-radius:12px; padding:14px 16px; font-size:.82rem; color:var(--ink-dim); background:rgba(255,255,255,.02); margin-bottom:18px;}
+.note-box b{color:var(--gold);}
+
+.soon-card{
+  border:1px dashed var(--panel-line); border-radius:var(--radius); padding:44px 24px; text-align:center;
+  background:linear-gradient(180deg, var(--panel), var(--bg2));
+}
+.soon-card .glyph{font-size:2.4rem; display:block; margin-bottom:14px; filter:drop-shadow(0 0 14px var(--violet));}
+.soon-card h3{font-family:'Cinzel Decorative', serif; color:var(--gold); font-size:1.2rem; margin:0 0 10px;}
+.soon-card p{color:var(--ink-dim); max-width:440px; margin:0 auto; font-size:.88rem; line-height:1.5;}
+.soon-card .steps{
+  display:inline-flex; flex-direction:column; gap:8px; margin-top:20px; text-align:left; font-size:.82rem; color:var(--ink-dim);
+}
+.soon-card .steps span{display:flex; align-items:center; gap:8px;}
+.soon-card .steps .num{width:20px; height:20px; border-radius:50%; background:var(--violet-soft); border:1px solid var(--panel-line); display:inline-flex; align-items:center; justify-content:center; font-size:.7rem; color:var(--ink);}
+
+.live-indicator{display:inline-flex; align-items:center; gap:8px; font-size:.78rem; color:var(--ink-dim); border:1px solid var(--panel-line); padding:6px 12px; border-radius:999px; margin-top:4px;}
+.live-dot{width:7px; height:7px; border-radius:50%; background:var(--ink-dim); flex:0 0 auto;}
+.live-dot.ok{background:var(--green); box-shadow:0 0 8px var(--green); animation:pulse 2s ease-in-out infinite;}
+.live-dot.warn{background:var(--amber); box-shadow:0 0 8px var(--amber);}
+.live-dot.err{background:var(--red); box-shadow:0 0 8px var(--red);}
+@keyframes pulse{0%,100%{opacity:1;} 50%{opacity:.35;}}
+.nav button .tag.tag-live{background:rgba(57,255,136,.15); color:var(--green); border:1px solid rgba(57,255,136,.4);}
+.caja-alert-banner{border:1px solid var(--panel-line); border-radius:12px; padding:14px 16px; font-size:.85rem; margin-bottom:18px; background:rgba(255,255,255,.02);}
+.caja-alert-banner.err{border-color:rgba(255,59,87,.4); background:rgba(255,59,87,.08); color:#ffb3bf;}
+.caja-alert-banner.warn{border-color:rgba(255,176,32,.4); background:rgba(255,176,32,.08); color:#ffd98f;}
+.caja-alert-banner a, .caja-alert-banner b{color:var(--gold);}
+.cbar-row{display:flex; align-items:center; gap:12px; margin:10px 0;}
+.cbar-row .d{width:90px; flex:0 0 auto; font-size:.78rem; color:var(--ink-dim);}
+.cbar-track{flex:1; height:16px; border-radius:8px; background:#1a0f36; overflow:hidden;}
+.cbar-fill{height:100%; border-radius:8px; background:linear-gradient(90deg, var(--green), var(--cyan)); box-shadow:0 0 10px var(--green);}
+.cbar-fill.desc{background:linear-gradient(90deg, var(--red), var(--pink)); box-shadow:0 0 10px var(--red);}
+.cbar-row .v{width:80px; flex:0 0 auto; font-size:.78rem; text-align:right; font-variant-numeric:tabular-nums;}
+
+.split{display:grid; grid-template-columns:1fr 1fr; gap:22px;}
+@media (max-width:900px){ .split{grid-template-columns:1fr;} }
+.mini-row{display:flex; justify-content:space-between; padding:8px 0; border-top:1px solid var(--panel-line); font-size:.87rem;}
+.mini-row:first-child{border-top:none;}
+.mini-row .d{color:var(--ink-dim); font-size:.72rem;}
+.mini-row b{font-variant-numeric:tabular-nums;}
+.total-row{display:flex; justify-content:space-between; padding:14px 0 0; margin-top:8px; border-top:1px solid var(--panel-line); font-weight:700; font-size:1rem;}
+
+@media (prefers-reduced-motion:no-preference){
+  .bar-fill, .cat-card .fcbar i{transition:width 1s cubic-bezier(.16,1,.3,1);}
+}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<div class="bg-stars"></div>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="crest">🔮</span>
+      <h1>Mi Reino</h1>
+      <small>PANEL DE BOCADITO</small>
+    </div>
+    <div class="nav-group-label">Carta</div>
+    <nav class="nav" id="nav">
+      <button data-view="resumen" class="active"><span class="ic">🏰</span> Resumen</button>
+      <button data-view="secciones"><span class="ic">📜</span> Secciones</button>
+      <button data-view="alertas"><span class="ic">🔥</span> Alertas</button>
+      <button data-view="grimorio"><span class="ic">📖</span> Grimorio</button>
+      <button data-view="bebidas"><span class="ic">🧪</span> Bebidas</button>
+    </nav>
+    <div class="nav-group-label">Despensa y gastos</div>
+    <nav class="nav">
+      <button data-view="productos"><span class="ic">🧺</span> Productos</button>
+      <button data-view="costes"><span class="ic">🕯️</span> Costes fijos</button>
+    </nav>
+    <div class="nav-group-label">Caja y ventas</div>
+    <nav class="nav">
+      <button data-view="caja"><span class="ic">🧾</span> Caja <span class="tag" id="caja-live-tag">●live</span></button>
+      <button data-view="proveedores"><span class="ic">🧙</span> Proveedores <span class="tag">pronto</span></button>
+      <button data-view="ventas"><span class="ic">📈</span> Ventas <span class="tag">pronto</span></button>
+    </nav>
+    <div class="side-foot">☾ 🜂 ☽<br>Datos del escandallo</div>
+  </aside>
+
+  <main class="main">
+
+    <!-- RESUMEN -->
+    <section class="view active" id="view-resumen">
+      <div class="page-head"><div>
+        <h2>Resumen del reino</h2>
+        <p>Aquí se cuecen los números de Bocadito — cada plato, cada margen, cada poción con demasiado food cost.</p>
+      </div></div>
+      <div class="kpis">
+        <div class="kpi k-cyan"><div class="lbl">POCIONES EN LA CARTA</div><div class="val" id="kpi-count">0</div><div class="sub">platos con receta y PVP reales</div></div>
+        <div class="kpi k-green"><div class="lbl">GANANCIA MEDIA</div><div class="val" id="kpi-gan">0%</div><div class="sub">sobre el PVP sin IVA</div></div>
+        <div class="kpi k-pink"><div class="lbl">FOOD COST MEDIO</div><div class="val" id="kpi-fc">0%</div><div class="sub">materia prima / PVP sin IVA</div></div>
+        <div class="kpi k-red"><div class="lbl">CALDEROS EN ALERTA</div><div class="val" id="kpi-alert">0</div><div class="sub">food cost por encima del 55%</div></div>
+      </div>
+      <div class="panel grid2">
+        <div>
+          <h3>Food cost medio por sección</h3>
+          <p class="desc">Cuanto más larga la barra, más caro sale hacer ese plato frente a lo que cobras por él.</p>
+          <div id="bars"></div>
+        </div>
+        <div>
+          <h3>Reparto del reino</h3>
+          <p class="desc">Cuántos platos tiene cada sección de la carta.</p>
+          <div class="donut-wrap">
+            <svg id="donut" width="210" height="210" viewBox="0 0 220 220"></svg>
+            <div class="donut-legend" id="donut-legend"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIONES -->
+    <section class="view" id="view-secciones">
+      <div class="page-head"><div>
+        <h2>Secciones de la carta</h2>
+        <p>Toca una sección para ver sus platos en el Grimorio, filtrados al momento.</p>
+      </div></div>
+      <div class="card-grid" id="cat-cards"></div>
+    </section>
+
+    <!-- ALERTAS -->
+    <section class="view" id="view-alertas">
+      <div class="page-head"><div>
+        <h2>Alertas del caldero</h2>
+        <p>Los platos que más te cuestan y los que más margen te dejan, de un vistazo.</p>
+      </div></div>
+      <div class="panel alert-grid">
+        <div>
+          <h3>🔥 Calderos que hierven de más</h3>
+          <p class="desc">Food cost más alto — candidatos a revisar receta o precio.</p>
+          <ul class="alert-list" id="list-worst"></ul>
+        </div>
+        <div>
+          <h3>✨ Hechizos más rentables</h3>
+          <p class="desc">Los que menos cuestan frente a lo que cobras por ellos.</p>
+          <ul class="alert-list" id="list-best"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- GRIMORIO -->
+    <section class="view" id="view-grimorio">
+      <div class="page-head"><div>
+        <h2>Grimorio completo</h2>
+        <p>Todos los platos de la carta. Busca, filtra por sección, ordena tocando las cabeceras.</p>
+      </div></div>
+      <div class="panel">
+        <div class="controls">
+          <input id="search" type="text" placeholder="Buscar un plato...">
+          <select id="filter-cat"></select>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th data-k="catLabel">Sección</th><th data-k="name">Plato</th>
+              <th data-k="pvp" class="num">PVP</th><th data-k="coste" class="num">Coste</th>
+              <th data-k="fc" class="num">Food cost</th><th data-k="ganp" class="num">Ganancia</th>
+            </tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- BEBIDAS -->
+    <section class="view" id="view-bebidas">
+      <div class="page-head"><div>
+        <h2>Pociones y bebidas</h2>
+        <p>PVP de carta cargado. El coste de compra sigue sin confirmar, así que aquí no hay food cost todavía.</p>
+      </div></div>
+      <div class="note-box"><b>Pendiente:</b> pásame el coste de compra de cada bebida y el precio de las latas para llevar de Nestea, cerveza y agua, y esta sección se activa entera.</div>
+      <div class="panel">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th class="nosort">Bebida</th><th class="num nosort">PVP con IVA</th><th class="num nosort">Coste</th></tr></thead>
+            <tbody id="tbody-bev"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCTOS (ingredientes + envases) -->
+    <section class="view" id="view-productos">
+      <div class="page-head"><div>
+        <h2>Despensa del reino</h2>
+        <p>Todo lo que compras para hacer la carta: ingredientes, salsas, panes, patatas y envases — servilletas incluidas.</p>
+      </div></div>
+      <div class="kpis" style="grid-template-columns:repeat(3,1fr);">
+        <div class="kpi k-cyan"><div class="lbl">PRODUCTOS EN DESPENSA</div><div class="val" id="kpi-prod-count">0</div><div class="sub">ingredientes, panes, patatas y envases</div></div>
+        <div class="kpi k-amber"><div class="lbl">PRECIOS PENDIENTES</div><div class="val" id="kpi-prod-pend">0</div><div class="sub">sin peso o precio confirmado (en amarillo)</div></div>
+        <div class="kpi k-green"><div class="lbl">GRUPOS</div><div class="val" id="kpi-prod-groups">0</div><div class="sub">categorías de la despensa</div></div>
+      </div>
+      <div class="panel">
+        <div class="controls">
+          <input id="search-prod" type="text" placeholder="Buscar un ingrediente o envase...">
+          <select id="filter-group"></select>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th data-k="groupLabel">Grupo</th><th data-k="name">Producto</th>
+              <th data-k="peso" class="num">Peso / uds</th><th data-k="precio" class="num">Precio pack</th>
+              <th data-k="preciounidad" class="num">Precio / g o ud</th>
+            </tr></thead>
+            <tbody id="tbody-prod"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- COSTES FIJOS -->
+    <section class="view" id="view-costes">
+      <div class="page-head"><div>
+        <h2>Costes fijos y nómina</h2>
+        <p>Lo que cuesta mantener Bocadito abierto cada mes, antes de vender un solo bocadillo.</p>
+      </div></div>
+      <div class="kpis" style="grid-template-columns:repeat(4,1fr);">
+        <div class="kpi k-pink"><div class="lbl">ESTRUCTURA / MES</div><div class="val" id="kpi-estructura">0 €</div><div class="sub">alquiler, luz, autónomo...</div></div>
+        <div class="kpi k-cyan"><div class="lbl">NÓMINA / MES</div><div class="val" id="kpi-nomina">0 €</div><div class="sub">coste empresa, recibos reales</div></div>
+        <div class="kpi k-red"><div class="lbl">TOTAL FIJOS / MES</div><div class="val" id="kpi-total-fijos">0 €</div><div class="sub">estructura + nómina</div></div>
+        <div class="kpi k-green"><div class="lbl">IMPUTADO POR PRODUCTO</div><div class="val" id="kpi-imputado">0 €</div><div class="sub">sobre <span id="kpi-volumen">0</span> productos/mes</div></div>
+      </div>
+      <div class="note-box"><b>Pendiente:</b> confirmar los importes de autónomo, alquileres, luz, agua, wifi, seguro y moto — están marcados como estimados.</div>
+      <div class="split">
+        <div class="panel">
+          <h3>Estructura</h3>
+          <p class="desc">Gastos fijos del local, pendientes de confirmar.</p>
+          <div id="list-estructura"></div>
+          <div class="total-row"><span>Total estructura</span><span id="total-estructura">0 €</span></div>
+        </div>
+        <div class="panel">
+          <h3>Nómina (recibos mayo 2026)</h3>
+          <p class="desc">Coste empresa real de cada trabajador.</p>
+          <div id="list-nomina"></div>
+          <div class="total-row"><span>Total nómina</span><span id="total-nomina">0 €</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CAJA (live) -->
+    <section class="view" id="view-caja">
+      <div class="page-head"><div>
+        <h2>Cierres de caja</h2>
+        <p>Conectado en vivo a tu Drive de cierres — se actualiza solo cada minuto, sin que tengas que volver a pedírmelo.</p>
+      </div>
+      <div class="live-indicator" id="caja-status">
+        <span class="live-dot" id="caja-dot"></span>
+        <span id="caja-status-text">Conectando con Google Drive...</span>
+      </div>
+      </div>
+
+      <div id="caja-banner"></div>
+
+      <div class="kpis" style="grid-template-columns:repeat(4,1fr);">
+        <div class="kpi k-cyan"><div class="lbl">CIERRES REGISTRADOS</div><div class="val" id="caja-kpi-n">—</div><div class="sub">días con cierre guardado</div></div>
+        <div class="kpi k-green"><div class="lbl">FACTURACIÓN ACUMULADA</div><div class="val" id="caja-kpi-fact">—</div><div class="sub">suma de todos los cierres</div></div>
+        <div class="kpi k-pink"><div class="lbl">TICKET MEDIO</div><div class="val" id="caja-kpi-ticket">—</div><div class="sub">media de todos los días</div></div>
+        <div class="kpi k-amber"><div class="lbl">ÚLTIMO CIERRE</div><div class="val" id="caja-kpi-ultimo">—</div><div class="sub" id="caja-kpi-ultimo-sub">&nbsp;</div></div>
+      </div>
+
+      <div class="panel">
+        <h3>Facturación por día</h3>
+        <p class="desc">Se irá llenando a medida que registres cierres. Las barras en rojo tienen descuadre de caja.</p>
+        <div id="caja-bars"></div>
+        <div id="caja-empty" style="display:none; text-align:center; color:var(--ink-dim); padding:30px 0; font-size:.88rem;">
+          Aún solo hay un cierre registrado (1 de septiembre) — en cuanto añadas más días, aparecerán aquí solas.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Histórico de cierres</h3>
+        <p class="desc">Tal cual está en tu hoja de cierres, ordenado por fecha.</p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th class="nosort">Fecha</th><th class="nosort">ID arqueo</th><th class="num nosort">Facturación</th>
+              <th class="num nosort">Nº tickets</th><th class="num nosort">Ticket medio</th>
+              <th class="num nosort">Efectivo</th><th class="num nosort">Tarjeta</th><th class="num nosort">Descuadre</th>
+            </tr></thead>
+            <tbody id="caja-tbody"><tr><td colspan="8" style="color:var(--ink-dim); text-align:center;">Cargando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROVEEDORES (placeholder) -->
+    <section class="view" id="view-proveedores">
+      <div class="page-head"><div>
+        <h2>Proveedores</h2>
+        <p>Todavía no tengo acceso a este Drive.</p>
+      </div></div>
+      <div class="soon-card">
+        <span class="glyph">🧙</span>
+        <h3>Este rincón del reino está a oscuras</h3>
+        <p>En cuanto me compartas el Drive de proveedores, esta sección mostrará quién te suministra cada producto, precios por proveedor y comparativas para saber dónde te conviene comprar cada cosa.</p>
+        <div class="steps">
+          <span><span class="num">1</span> Comparte el Drive de proveedores</span>
+          <span><span class="num">2</span> Dime qué columnas tiene (proveedor, producto, precio, plazo...)</span>
+          <span><span class="num">3</span> Conecto esta sección y cruzo los precios con la Despensa</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- VENTAS (placeholder) -->
+    <section class="view" id="view-ventas">
+      <div class="page-head"><div>
+        <h2>Ventas</h2>
+        <p>Todavía no tengo acceso a este Drive.</p>
+      </div></div>
+      <div class="soon-card">
+        <span class="glyph">📈</span>
+        <h3>Aún no hay hechizo de ventas</h3>
+        <p>Con el Drive de ventas podré mostrar aquí facturación por día o producto, los platos que más se venden, y cruzarlo con el food cost del Grimorio para ver qué te da más dinero de verdad, no solo más margen.</p>
+        <div class="steps">
+          <span><span class="num">1</span> Comparte el Drive de ventas</span>
+          <span><span class="num">2</span> Dime qué columnas tiene (fecha, producto, cantidad, importe...)</span>
+          <span><span class="num">3</span> Conecto esta sección con la carta y los costes fijos</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+const FOOD = [{"cat": "ROSCAS", "name": "Rosca Pollo", "pvp": 10.2, "coste": 4.24433333333333, "fc": 0.457722222222222, "gan": 5.02839393939394, "ganp": 0.542277777777778, "mn": 2.93273727272727, "mnp": 0.316275588235294, "catLabel": "Roscas"}, {"cat": "ROSCAS", "name": "Rosca Serrana", "pvp": 10.2, "coste": 4.475, "fc": 0.482598039215686, "gan": 4.79772727272727, "ganp": 0.517401960784314, "mn": 2.70207060606061, "mnp": 0.29139977124183, "catLabel": "Roscas"}, {"cat": "ROSCAS", "name": "Rosca Bacon", "pvp": 10.2, "coste": 4.16926666666667, "fc": 0.449626797385621, "gan": 5.10346060606061, "ganp": 0.550373202614379, "mn": 3.00780393939394, "mnp": 0.324371013071896, "catLabel": "Roscas"}, {"cat": "ROSCAS", "name": "Rosca 3 Salsas", "pvp": 10.2, "coste": 4.39166666666667, "fc": 0.473611111111111, "gan": 4.88106060606061, "ganp": 0.526388888888889, "mn": 2.78540393939394, "mnp": 0.300386699346405, "catLabel": "Roscas"}, {"cat": "ROSCAS", "name": "Rosca Filetes", "pvp": 10.2, "coste": 4.00233333333333, "fc": 0.431624183006536, "gan": 5.27039393939394, "ganp": 0.568375816993464, "mn": 3.17473727272727, "mnp": 0.34237362745098, "catLabel": "Roscas"}, {"cat": "ROSCAS", "name": "Rosca CBD", "pvp": 13.2, "coste": 4.6656, "fc": 0.3888, "gan": 7.3344, "ganp": 0.6112, "mn": 5.23874333333333, "mnp": 0.436561944444444, "catLabel": "Roscas"}, {"cat": "ROSCAS", "name": "Rosca Alameda", "pvp": 12.7, "coste": 5.8326, "fc": 0.505185826771654, "gan": 5.71285454545454, "ganp": 0.494814173228346, "mn": 3.61719787878788, "mnp": 0.313300603674541, "catLabel": "Roscas"}, {"cat": "ROSCAS", "name": "Rosca Ranchera", "pvp": 14, "coste": 5.31713333333333, "fc": 0.417774761904762, "gan": 7.41013939393939, "ganp": 0.582225238095238, "mn": 5.31448272727273, "mnp": 0.4175665, "catLabel": "Roscas"}, {"cat": "HAMBURGUESAS Y ESPECIALES", "name": "Burguer Clásica", "pvp": 6.5, "coste": 3.02893333333333, "fc": 0.512588717948718, "gan": 2.88015757575758, "ganp": 0.487411282051282, "mn": 0.784500909090909, "mnp": 0.132761692307692, "catLabel": "Hamburguesas y Especiales"}, {"cat": "HAMBURGUESAS Y ESPECIALES", "name": "Burguer Bacon-Queso", "pvp": 7.7, "coste": 3.33583333333333, "fc": 0.476547619047619, "gan": 3.66416666666667, "ganp": 0.523452380952381, "mn": 1.56851, "mnp": 0.224072857142857, "catLabel": "Hamburguesas y Especiales"}, {"cat": "HAMBURGUESAS Y ESPECIALES", "name": "Burguer Tejana", "pvp": 9, "coste": 4.10913414634146, "fc": 0.502227506775068, "gan": 4.07268403547672, "ganp": 0.497772493224932, "mn": 1.97702736881005, "mnp": 0.241636678410118, "catLabel": "Hamburguesas y Especiales"}, {"cat": "HAMBURGUESAS Y ESPECIALES", "name": "Burguer Alameda", "pvp": 8, "coste": 3.46739215686275, "fc": 0.476766421568627, "gan": 3.80533511586453, "ganp": 0.523233578431373, "mn": 1.70967844919786, "mnp": 0.235080786764706, "catLabel": "Hamburguesas y Especiales"}, {"cat": "HAMBURGUESAS Y ESPECIALES", "name": "Especial Buey", "pvp": 11.7, "coste": 3.97655882352941, "fc": 0.37386450477627, "gan": 6.65980481283422, "ganp": 0.626135495223731, "mn": 4.56414814616756, "mnp": 0.429107945366181, "catLabel": "Hamburguesas y Especiales"}, {"cat": "HAMBURGUESAS Y ESPECIALES", "name": "Especial Ternera Cabra-Bacon", "pvp": 11, "coste": 4.7727, "fc": 0.47727, "gan": 5.2273, "ganp": 0.52273, "mn": 3.13164333333333, "mnp": 0.313164333333333, "catLabel": "Hamburguesas y Especiales"}, {"cat": "HAMBURGUESAS Y ESPECIALES", "name": "Especial Pulled Pork BBQ", "pvp": 10.5, "coste": 4.88137777777778, "fc": 0.511382433862434, "gan": 4.66407676767677, "ganp": 0.488617566137566, "mn": 2.5684201010101, "mnp": 0.269072582010582, "catLabel": "Hamburguesas y Especiales"}, {"cat": "CAMPEROS - NORMAL", "name": "Mixto (Normal)", "pvp": 5.1, "coste": 2.25373333333333, "fc": 0.486099346405229, "gan": 2.3826303030303, "ganp": 0.513900653594771, "mn": 0.286973636363636, "mnp": 0.0618962745098039, "catLabel": "Camperos (Normal)"}, {"cat": "CAMPEROS - NORMAL", "name": "Pollo (Normal)", "pvp": 6.3, "coste": 2.28888333333333, "fc": 0.399646296296296, "gan": 3.43838939393939, "ganp": 0.600353703703704, "mn": 1.34273272727273, "mnp": 0.234445396825397, "catLabel": "Camperos (Normal)"}, {"cat": "CAMPEROS - NORMAL", "name": "Serrano (Normal)", "pvp": 6.3, "coste": 2.3935, "fc": 0.417912698412698, "gan": 3.33377272727273, "ganp": 0.582087301587302, "mn": 1.23811606060606, "mnp": 0.216178994708995, "catLabel": "Camperos (Normal)"}, {"cat": "CAMPEROS - NORMAL", "name": "Bacon (Normal)", "pvp": 5.5, "coste": 2.53133333333333, "fc": 0.506266666666667, "gan": 2.46866666666667, "ganp": 0.493733333333333, "mn": 0.373010000000001, "mnp": 0.0746020000000001, "catLabel": "Camperos (Normal)"}, {"cat": "CAMPEROS - NORMAL", "name": "Lomo (Normal)", "pvp": 5.5, "coste": 2.03933333333333, "fc": 0.407866666666667, "gan": 2.96066666666667, "ganp": 0.592133333333333, "mn": 0.86501, "mnp": 0.173002, "catLabel": "Camperos (Normal)"}, {"cat": "CAMPEROS - NORMAL", "name": "Filetes (Normal)", "pvp": 5.5, "coste": 2.41433333333333, "fc": 0.482866666666667, "gan": 2.58566666666667, "ganp": 0.517133333333333, "mn": 0.49001, "mnp": 0.098002, "catLabel": "Camperos (Normal)"}, {"cat": "CAMPEROS - NORMAL", "name": "Vegetal (Normal)", "pvp": 5.3, "coste": 1.95766666666667, "fc": 0.406308176100629, "gan": 2.86051515151515, "ganp": 0.593691823899371, "mn": 0.764858484848484, "mnp": 0.158744213836478, "catLabel": "Camperos (Normal)"}, {"cat": "CAMPEROS - NORMAL", "name": "Alameda (Normal)", "pvp": 7.5, "coste": 2.6922, "fc": 0.394856, "gan": 4.12598181818182, "ganp": 0.605144, "mn": 2.03032515151515, "mnp": 0.297781022222222, "catLabel": "Camperos (Normal)"}, {"cat": "CAMPEROS - NORMAL", "name": "CBD (Normal)", "pvp": 7.8, "coste": 2.5038, "fc": 0.3531, "gan": 4.58710909090909, "ganp": 0.6469, "mn": 2.49145242424242, "mnp": 0.351358675213675, "catLabel": "Camperos (Normal)"}, {"cat": "CAMPEROS - NORMAL", "name": "3 Salsas (Normal)", "pvp": 6.8, "coste": 2.7302, "fc": 0.44165, "gan": 3.45161818181818, "ganp": 0.55835, "mn": 1.35596151515151, "mnp": 0.219346715686274, "catLabel": "Camperos (Normal)"}, {"cat": "CAMPEROS - NORMAL", "name": "Atún (Normal)", "pvp": 6.2, "coste": 2.1101, "fc": 0.374372580645161, "gan": 3.52626363636364, "ganp": 0.625627419354839, "mn": 1.43060696969697, "mnp": 0.253817365591398, "catLabel": "Camperos (Normal)"}, {"cat": "CAMPEROS - NORMAL", "name": "El Chingón (Normal)", "pvp": 11.5, "coste": 6.21175923076923, "fc": 0.594168274247492, "gan": 4.24278622377622, "ganp": 0.405831725752508, "mn": 2.14712955710956, "mnp": 0.205377609810479, "catLabel": "Camperos (Normal)"}, {"cat": "CAMPEROS - XXL", "name": "Mixto (XXL)", "pvp": 6.5, "coste": 2.91522666666667, "fc": 0.493346051282051, "gan": 2.99386424242424, "ganp": 0.506653948717949, "mn": 0.898207575757576, "mnp": 0.152004358974359, "catLabel": "Camperos (XXL)"}, {"cat": "CAMPEROS - XXL", "name": "Pollo (XXL)", "pvp": 8, "coste": 2.94989666666667, "fc": 0.405610791666667, "gan": 4.32283060606061, "ganp": 0.594389208333333, "mn": 2.22717393939394, "mnp": 0.306236416666667, "catLabel": "Camperos (XXL)"}, {"cat": "CAMPEROS - XXL", "name": "Serrano (XXL)", "pvp": 8.2, "coste": 3.1109, "fc": 0.417315853658537, "gan": 4.34364545454545, "ganp": 0.582684146341463, "mn": 2.24798878787879, "mnp": 0.301559471544715, "catLabel": "Camperos (XXL)"}, {"cat": "CAMPEROS - XXL", "name": "Bacon (XXL)", "pvp": 7.2, "coste": 3.30386666666667, "fc": 0.504757407407407, "gan": 3.24158787878788, "ganp": 0.495242592592593, "mn": 1.14593121212121, "mnp": 0.175072824074074, "catLabel": "Camperos (XXL)"}, {"cat": "CAMPEROS - XXL", "name": "Lomo (XXL)", "pvp": 7.2, "coste": 2.61506666666667, "fc": 0.399524074074074, "gan": 3.93038787878788, "ganp": 0.600475925925926, "mn": 1.83473121212121, "mnp": 0.280306157407407, "catLabel": "Camperos (XXL)"}, {"cat": "CAMPEROS - XXL", "name": "Filetes (XXL)", "pvp": 7.6, "coste": 3.14006666666667, "fc": 0.454483333333333, "gan": 3.76902424242424, "ganp": 0.545516666666667, "mn": 1.67336757575758, "mnp": 0.242197938596491, "catLabel": "Camperos (XXL)"}, {"cat": "CAMPEROS - XXL", "name": "Vegetal (XXL)", "pvp": 6.8, "coste": 2.3354, "fc": 0.377785294117647, "gan": 3.84641818181818, "ganp": 0.622214705882353, "mn": 1.75076151515151, "mnp": 0.283211421568627, "catLabel": "Camperos (XXL)"}, {"cat": "CAMPEROS - XXL", "name": "Alameda (XXL)", "pvp": 9.3, "coste": 3.44641333333333, "fc": 0.407640286738351, "gan": 5.00813212121212, "ganp": 0.592359713261649, "mn": 2.91247545454546, "mnp": 0.344486344086022, "catLabel": "Camperos (XXL)"}, {"cat": "CAMPEROS - XXL", "name": "CBD (XXL)", "pvp": 9.8, "coste": 3.26532, "fc": 0.366515510204082, "gan": 5.64377090909091, "ganp": 0.633484489795918, "mn": 3.54811424242424, "mnp": 0.398257721088435, "catLabel": "Camperos (XXL)"}, {"cat": "CAMPEROS - XXL", "name": "3 Salsas (XXL)", "pvp": 8.4, "coste": 3.49961333333333, "fc": 0.458282698412698, "gan": 4.1367503030303, "ganp": 0.541717301587302, "mn": 2.04109363636364, "mnp": 0.267286071428571, "catLabel": "Camperos (XXL)"}, {"cat": "CAMPEROS - XXL", "name": "Atún (XXL)", "pvp": 7.8, "coste": 2.63147333333333, "fc": 0.371105213675214, "gan": 4.45943575757576, "ganp": 0.628894786324786, "mn": 2.36377909090909, "mnp": 0.333353461538462, "catLabel": "Camperos (XXL)"}, {"cat": "CAMPEROS - XXL", "name": "El Chingón (XXL)", "pvp": 16.3, "coste": 8.44818292307692, "fc": 0.570122773949976, "gan": 6.3699988951049, "ganp": 0.429877226050024, "mn": 4.27434222843823, "mnp": 0.288452543023439, "catLabel": "Camperos (XXL)"}, {"cat": "TOP BOCADILLO (pan de semillas)", "name": "Filete y Queso", "pvp": 8.8, "coste": 2.5848, "fc": 0.3231, "gan": 5.4152, "ganp": 0.6769, "mn": 3.31954333333333, "mnp": 0.414942916666667, "catLabel": "Top Bocadillo"}, {"cat": "TOP BOCADILLO (pan de semillas)", "name": "Pollo y Guacamole", "pvp": 9, "coste": 2.96016292682927, "fc": 0.361797691056911, "gan": 5.22165525498891, "ganp": 0.63820230894309, "mn": 3.12599858832225, "mnp": 0.382066494128275, "catLabel": "Top Bocadillo"}, {"cat": "TOP BOCADILLO (pan de semillas)", "name": "Bocadito Trufado", "pvp": 8.8, "coste": 3.09173409090909, "fc": 0.386466761363636, "gan": 4.90826590909091, "ganp": 0.613533238636364, "mn": 2.81260924242424, "mnp": 0.35157615530303, "catLabel": "Top Bocadillo"}, {"cat": "TOP BOCADILLO (pan de semillas)", "name": "Salvaje", "pvp": 8.8, "coste": 2.82868292682927, "fc": 0.353585365853659, "gan": 5.17131707317073, "ganp": 0.646414634146342, "mn": 3.07566040650407, "mnp": 0.384457550813008, "catLabel": "Top Bocadillo"}, {"cat": "ENSALADAS - GRANDE", "name": "Mediterránea (Grande)", "pvp": 8.5, "coste": 3.48713333333333, "fc": 0.451276078431373, "gan": 4.24013939393939, "ganp": 0.548723921568627, "mn": 2.14448272727273, "mnp": 0.277521294117647, "catLabel": "Ensaladas (Grande)"}, {"cat": "ENSALADAS - GRANDE", "name": "César (Grande)", "pvp": 9, "coste": 3.65358780487805, "fc": 0.446549620596206, "gan": 4.52823037694013, "ganp": 0.553450379403794, "mn": 2.43257371027347, "mnp": 0.297314564588979, "catLabel": "Ensaladas (Grande)"}, {"cat": "ENSALADAS - GRANDE", "name": "Bocadito (Grande)", "pvp": 9.2, "coste": 3.6010431088, "fc": 0.430559502139131, "gan": 4.76259325483636, "ganp": 0.569440497860869, "mn": 2.6669365881697, "mnp": 0.318872852933333, "catLabel": "Ensaladas (Grande)"}, {"cat": "ENSALADAS - GRANDE", "name": "Delicia (Grande)", "pvp": 10.2, "coste": 4.67206585365854, "fc": 0.503850239120038, "gan": 4.60066141906874, "ganp": 0.496149760879962, "mn": 2.50500475240207, "mnp": 0.270147571337478, "catLabel": "Ensaladas (Grande)"}, {"cat": "ENSALADAS - PEQUEÑA", "name": "Mediterránea (Pequeña)", "pvp": 7, "coste": 2.83104, "fc": 0.444877714285714, "gan": 3.53259636363636, "ganp": 0.555122285714286, "mn": 1.4369396969697, "mnp": 0.22580480952381, "catLabel": "Ensaladas (Pequeña)"}, {"cat": "ENSALADAS - PEQUEÑA", "name": "César (Pequeña)", "pvp": 7.5, "coste": 2.92701024390244, "fc": 0.429294835772358, "gan": 3.89117157427938, "ganp": 0.570705164227642, "mn": 1.79551490761271, "mnp": 0.263342186449864, "catLabel": "Ensaladas (Pequeña)"}, {"cat": "ENSALADAS - PEQUEÑA", "name": "Bocadito (Pequeña)", "pvp": 7.4, "coste": 2.88497448704, "fc": 0.428847558884324, "gan": 3.84229824023273, "ganp": 0.571152441115676, "mn": 1.74664157356606, "mnp": 0.259635909584144, "catLabel": "Ensaladas (Pequeña)"}, {"cat": "ENSALADAS - PEQUEÑA", "name": "Delicia (Pequeña)", "pvp": 9.2, "coste": 3.74179268292683, "fc": 0.447388255567338, "gan": 4.62184368070953, "ganp": 0.552611744432662, "mn": 2.52618701404287, "mnp": 0.302044099505125, "catLabel": "Ensaladas (Pequeña)"}, {"cat": "PICOTEO Y PATATAS - RACIÓN", "name": "Nuggets (Ración)", "pvp": 7.4, "coste": 2.58136666666667, "fc": 0.383716666666667, "gan": 4.14590606060606, "ganp": 0.616283333333333, "mn": 2.05024939393939, "mnp": 0.304766801801802, "catLabel": "Picoteo (Ración)"}, {"cat": "PICOTEO Y PATATAS - RACIÓN", "name": "Lagrimitas (Ración)", "pvp": 7.9, "coste": 4.07747777777778, "fc": 0.567750070323488, "gan": 3.1043404040404, "ganp": 0.432249929676512, "mn": 1.00868373737374, "mnp": 0.140449634317862, "catLabel": "Picoteo (Ración)"}, {"cat": "PICOTEO Y PATATAS - RACIÓN", "name": "Alitas (Ración)", "pvp": 8.5, "coste": 3.20736666666667, "fc": 0.415070980392157, "gan": 4.51990606060606, "ganp": 0.584929019607843, "mn": 2.42424939393939, "mnp": 0.313726392156863, "catLabel": "Picoteo (Ración)"}, {"cat": "PICOTEO Y PATATAS - RACIÓN", "name": "Aros de Cebolla", "pvp": 2.8, "coste": 0.933866666666667, "fc": 0.366876190476191, "gan": 1.61158787878788, "ganp": 0.633123809523809, "mn": -0.484068787878788, "mnp": -0.190169880952381, "catLabel": "Picoteo (Ración)"}, {"cat": "PICOTEO Y PATATAS - RACIÓN", "name": "Nachos", "pvp": 4, "coste": 2.5075, "fc": 0.6895625, "gan": 1.12886363636364, "ganp": 0.3104375, "mn": -0.966793030303031, "mnp": -0.265868083333333, "catLabel": "Picoteo (Ración)"}, {"cat": "PICOTEO Y PATATAS - RACIÓN", "name": "Fritas (Ración)", "pvp": 6.2, "coste": 1.1647, "fc": 0.206640322580645, "gan": 4.47166363636364, "ganp": 0.793359677419355, "mn": 2.37600696969697, "mnp": 0.421549623655914, "catLabel": "Picoteo (Ración)"}, {"cat": "PICOTEO Y PATATAS - RACIÓN", "name": "Bravas (Ración)", "pvp": 6, "coste": 1.2775, "fc": 0.234208333333333, "gan": 4.17704545454545, "ganp": 0.765791666666667, "mn": 2.08138878787879, "mnp": 0.381587944444445, "catLabel": "Picoteo (Ración)"}, {"cat": "PICOTEO Y PATATAS - RACIÓN", "name": "Deluxe (Ración)", "pvp": 5.3, "coste": 1.81016666666667, "fc": 0.375694968553459, "gan": 3.00801515151515, "ganp": 0.624305031446541, "mn": 0.912358484848485, "mnp": 0.189357421383648, "catLabel": "Picoteo (Ración)"}, {"cat": "PICOTEO Y PATATAS - MEDIA", "name": "Nuggets (Media)", "pvp": 5.4, "coste": 1.88998666666667, "fc": 0.384997283950617, "gan": 3.01910424242424, "ganp": 0.615002716049383, "mn": 0.923447575757576, "mnp": 0.188109691358025, "catLabel": "Picoteo (Media)"}, {"cat": "PICOTEO Y PATATAS - MEDIA", "name": "Lagrimitas (Media)", "pvp": 5.9, "coste": 2.98214777777778, "fc": 0.555993653483992, "gan": 2.38148858585859, "ganp": 0.444006346516008, "mn": 0.285831919191919, "mnp": 0.0532906967984934, "catLabel": "Picoteo (Media)"}, {"cat": "PICOTEO Y PATATAS - MEDIA", "name": "Alitas (Media)", "pvp": 6.5, "coste": 2.34696666666667, "fc": 0.397178974358974, "gan": 3.56212424242424, "ganp": 0.602821025641026, "mn": 1.46646757575757, "mnp": 0.248171435897436, "catLabel": "Picoteo (Media)"}, {"cat": "PICOTEO Y PATATAS - MEDIA", "name": "Fritas (Media)", "pvp": 4.7, "coste": 0.85582, "fc": 0.20029829787234, "gan": 3.41690727272727, "ganp": 0.79970170212766, "mn": 1.32125060606061, "mnp": 0.309228865248227, "catLabel": "Picoteo (Media)"}, {"cat": "PICOTEO Y PATATAS - MEDIA", "name": "Bravas (Media)", "pvp": 4.8, "coste": 0.938164, "fc": 0.214995916666667, "gan": 3.42547236363636, "ganp": 0.785004083333333, "mn": 1.3298156969697, "mnp": 0.304749430555556, "catLabel": "Picoteo (Media)"}, {"cat": "PICOTEO Y PATATAS - MEDIA", "name": "Deluxe (Media)", "pvp": 4.2, "coste": 1.32701066666667, "fc": 0.347550412698413, "gan": 2.49117115151515, "ganp": 0.652449587301587, "mn": 0.395514484848485, "mnp": 0.103587126984127, "catLabel": "Picoteo (Media)"}, {"cat": "PATATAS ESPECIALES - GRANDE", "name": "Bacon y Queso (Grande)", "pvp": 10.5, "coste": 3.316, "fc": 0.347390476190476, "gan": 6.22945454545455, "ganp": 0.652609523809524, "mn": 4.13379787878788, "mnp": 0.43306453968254, "catLabel": "Patatas Especiales (Grande)"}, {"cat": "PATATAS ESPECIALES - GRANDE", "name": "Patatas Bomba (Grande)", "pvp": 10.5, "coste": 3.77, "fc": 0.394952380952381, "gan": 5.77545454545455, "ganp": 0.605047619047619, "mn": 3.67979787878788, "mnp": 0.385502634920635, "catLabel": "Patatas Especiales (Grande)"}, {"cat": "PATATAS ESPECIALES - MEDIA", "name": "Bacon y Queso (Media)", "pvp": 7.45, "coste": 2.3212, "fc": 0.342727516778524, "gan": 4.45152727272727, "ganp": 0.657272483221477, "mn": 2.35587060606061, "mnp": 0.347846666666667, "catLabel": "Patatas Especiales (Media)"}, {"cat": "PATATAS ESPECIALES - MEDIA", "name": "Patatas Bomba (Media)", "pvp": 7.5, "coste": 2.639, "fc": 0.387053333333333, "gan": 4.17918181818182, "ganp": 0.612946666666667, "mn": 2.08352515151515, "mnp": 0.305583688888889, "catLabel": "Patatas Especiales (Media)"}];
+const CATSTATS = [{"cat": "Hamburguesas y Especiales", "n": 7, "avgfc": 0.4758067434255337, "avgpvp": 9.200000000000001}, {"cat": "Ensaladas (Grande)", "n": 4, "avgfc": 0.458058860071687, "avgpvp": 9.225}, {"cat": "Roscas", "n": 8, "avgfc": 0.450867867702199, "avgpvp": 11.362499999999999}, {"cat": "Camperos (Normal)", "n": 12, "avgfc": 0.4387594476756255, "avgpvp": 6.608333333333333}, {"cat": "Ensaladas (Pequeña)", "n": 4, "avgfc": 0.43760209112743353, "avgpvp": 7.775}, {"cat": "Camperos (XXL)", "n": 12, "avgfc": 0.4355407740433364, "avgpvp": 8.591666666666667}, {"cat": "Picoteo (Ración)", "n": 8, "avgfc": 0.4049400040407425, "avgpvp": 6.0125}, {"cat": "Patatas Especiales (Grande)", "n": 2, "avgfc": 0.3711714285714285, "avgpvp": 10.5}, {"cat": "Patatas Especiales (Media)", "n": 2, "avgfc": 0.3648904250559285, "avgpvp": 7.475}, {"cat": "Top Bocadillo", "n": 4, "avgfc": 0.3562374545685515, "avgpvp": 8.850000000000001}, {"cat": "Picoteo (Media)", "n": 6, "avgfc": 0.35016908983850054, "avgpvp": 5.25}];
+const BEV = [{"cat": "BEBIDAS", "name": "Coca-Cola (Normal/Zero/Zero-Zero)", "pvp": 2.7, "coste": 0, "fc": 0, "gan": 2.45454545454545, "ganp": 1, "mn": 0.358888787878788, "mnp": 0.146213950617284, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Fanta (Naranja/Limón)", "pvp": 2.7, "coste": 0, "fc": 0, "gan": 2.45454545454545, "ganp": 1, "mn": 0.358888787878788, "mnp": 0.146213950617284, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Nestea (Limón/Maracuyá)", "pvp": 2.9, "coste": 0, "fc": 0, "gan": 2.63636363636364, "ganp": 1, "mn": 0.54070696969697, "mnp": 0.205095747126437, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Aquarius (Naranja/Limón)", "pvp": 2.9, "coste": 0, "fc": 0, "gan": 2.63636363636364, "ganp": 1, "mn": 0.54070696969697, "mnp": 0.205095747126437, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Zumo (Piña/Melocotón)", "pvp": 2, "coste": 0, "fc": 0, "gan": 1.81818181818182, "ganp": 1, "mn": -0.277474848484848, "mnp": -0.152611166666667, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Agua con gas", "pvp": 2.5, "coste": 0, "fc": 0, "gan": 2.27272727272727, "ganp": 1, "mn": 0.177070606060606, "mnp": 0.0779110666666667, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Agua grande", "pvp": 2.7, "coste": 0, "fc": 0, "gan": 2.45454545454545, "ganp": 1, "mn": 0.358888787878788, "mnp": 0.146213950617284, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Agua pequeña", "pvp": 1.7, "coste": 0, "fc": 0, "gan": 1.54545454545455, "ganp": 1, "mn": -0.550202121212121, "mnp": -0.356013137254902, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Lata para llevar (Fanta/Coca-Cola)", "pvp": 1.9, "coste": 0, "fc": 0, "gan": 1.72727272727273, "ganp": 1, "mn": -0.368383939393939, "mnp": -0.213274912280702, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Lata para llevar (Nestea limón/maracuyá)", "pvp": 0, "coste": 0, "fc": 0, "gan": 0, "ganp": 0, "mn": -2.09565666666667, "mnp": 0, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Lata para llevar (Cerveza)", "pvp": 0, "coste": 0, "fc": 0, "gan": 0, "ganp": 0, "mn": -2.09565666666667, "mnp": 0, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Lata para llevar (Agua)", "pvp": 0, "coste": 0, "fc": 0, "gan": 0, "ganp": 0, "mn": -2.09565666666667, "mnp": 0, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Caña Pequeña", "pvp": 2.5, "coste": 0, "fc": 0, "gan": 2.06611570247934, "ganp": 1, "mn": -0.0295409641873272, "mnp": -0.0142978266666664, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Caña Grande", "pvp": 3, "coste": 0, "fc": 0, "gan": 2.47933884297521, "ganp": 1, "mn": 0.383682176308541, "mnp": 0.154751811111111, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Pinta", "pvp": 3.7, "coste": 0, "fc": 0, "gan": 3.05785123966942, "ganp": 1, "mn": 0.962194573002755, "mnp": 0.314663630630631, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Jarra", "pvp": 4, "coste": 0, "fc": 0, "gan": 3.30578512396694, "ganp": 1, "mn": 1.21012845730028, "mnp": 0.366063858333334, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Mahou", "pvp": 3, "coste": 0, "fc": 0, "gan": 2.47933884297521, "ganp": 1, "mn": 0.383682176308541, "mnp": 0.154751811111111, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Tostada Mahou", "pvp": 2.8, "coste": 0, "fc": 0, "gan": 2.31404958677686, "ganp": 1, "mn": 0.218392920110193, "mnp": 0.0943769404761906, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Alhambra Verde", "pvp": 3.7, "coste": 0, "fc": 0, "gan": 3.05785123966942, "ganp": 1, "mn": 0.962194573002755, "mnp": 0.314663630630631, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Alhambra Especial", "pvp": 3, "coste": 0, "fc": 0, "gan": 2.47933884297521, "ganp": 1, "mn": 0.383682176308541, "mnp": 0.154751811111111, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Radler", "pvp": 3, "coste": 0, "fc": 0, "gan": 2.47933884297521, "ganp": 1, "mn": 0.383682176308541, "mnp": 0.154751811111111, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Vino Blanco", "pvp": 2.8, "coste": 0, "fc": 0, "gan": 2.31404958677686, "ganp": 1, "mn": 0.218392920110193, "mnp": 0.0943769404761906, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Vino Rioja", "pvp": 2.8, "coste": 0, "fc": 0, "gan": 2.31404958677686, "ganp": 1, "mn": 0.218392920110193, "mnp": 0.0943769404761906, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Sangría (Limón/Blanca)", "pvp": 2.9, "coste": 0, "fc": 0, "gan": 2.39669421487603, "ganp": 1, "mn": 0.301037548209367, "mnp": 0.125605321839081, "catLabel": "Bebidas"}, {"cat": "BEBIDAS", "name": "Sangría Casera (Blanca/Limón)", "pvp": 2.8, "coste": 0, "fc": 0, "gan": 2.31404958677686, "ganp": 1, "mn": 0.218392920110193, "mnp": 0.0943769404761906, "catLabel": "Bebidas"}];
+const ING = [{"name": "Pechuga de pollo", "group": "Carnes", "peso": 1000, "precio": 7.5, "preciounidad": 0.0075, "nota": "", "groupLabel": "Carnes", "pending": false}, {"name": "Filete de cerdo", "group": "Carnes", "peso": 1000, "precio": 6.8, "preciounidad": 0.0068, "nota": "", "groupLabel": "Carnes", "pending": false}, {"name": "Pulled Pork", "group": "Carnes", "peso": 1000, "precio": 12.9, "preciounidad": 0.0129, "nota": "", "groupLabel": "Carnes", "pending": false}, {"name": "Pollo empanado", "group": "Carnes", "peso": 1000, "precio": 9.9, "preciounidad": 0.0099, "nota": "", "groupLabel": "Carnes", "pending": false}, {"name": "Ham cerdo", "group": "Hamburguesas Formadas", "peso": 1, "precio": 1.5, "preciounidad": 1.5, "nota": "", "groupLabel": "Hamburguesas formadas", "pending": false}, {"name": "Ham buey", "group": "Hamburguesas Formadas", "peso": 1, "precio": 2.8, "preciounidad": 2.8, "nota": "", "groupLabel": "Hamburguesas formadas", "pending": false}, {"name": "Ham Ternera", "group": "Hamburguesas Formadas", "peso": 1, "precio": 2.82, "preciounidad": 2.82, "nota": "", "groupLabel": "Hamburguesas formadas", "pending": false}, {"name": "mini burguer", "group": "Hamburguesas Formadas", "peso": 1, "precio": 0.3, "preciounidad": 0.3, "nota": "No estaba en tu tabla: precio tomado del escandallo anterior - confirmar", "groupLabel": "Hamburguesas formadas", "pending": false}, {"name": "Jamón Cocido", "group": "Fiambres Y Embutidos", "peso": 1000, "precio": 5, "preciounidad": 0.005, "nota": "", "groupLabel": "Fiambres y embutidos", "pending": false}, {"name": "Jamon Serrano", "group": "Fiambres Y Embutidos", "peso": 500, "precio": 7.05, "preciounidad": 0.0141, "nota": "", "groupLabel": "Fiambres y embutidos", "pending": false}, {"name": "Bacon", "group": "Fiambres Y Embutidos", "peso": 1000, "precio": 6.6, "preciounidad": 0.0066, "nota": "", "groupLabel": "Fiambres y embutidos", "pending": false}, {"name": "Lomo Adobado", "group": "Fiambres Y Embutidos", "peso": 1000, "precio": 4.7, "preciounidad": 0.0047, "nota": "", "groupLabel": "Fiambres y embutidos", "pending": false}, {"name": "Queso Edam", "group": "Quesos", "peso": 1000, "precio": 5.5, "preciounidad": 0.0055, "nota": "", "groupLabel": "Quesos", "pending": false}, {"name": "Queso Brie", "group": "Quesos", "peso": 900, "precio": 11.25, "preciounidad": 0.0125, "nota": "", "groupLabel": "Quesos", "pending": false}, {"name": "4 Quesos", "group": "Quesos", "peso": 1000, "precio": 7.2, "preciounidad": 0.0072, "nota": "", "groupLabel": "Quesos", "pending": false}, {"name": "Cremfres", "group": "Quesos", "peso": 2000, "precio": 12.11, "preciounidad": 0.006055, "nota": "", "groupLabel": "Quesos", "pending": false}, {"name": "Queso Cheddar", "group": "Quesos", "peso": 1000, "precio": 8.58, "preciounidad": 0.00858, "nota": "", "groupLabel": "Quesos", "pending": false}, {"name": "Rulo de cabra", "group": "Quesos", "peso": 1000, "precio": 10.89, "preciounidad": 0.01089, "nota": "", "groupLabel": "Quesos", "pending": false}, {"name": "queso gouda", "group": "Quesos", "peso": null, "precio": null, "preciounidad": 0, "nota": "Usado en Burguer buey (versión antigua). Sin precio - pendiente", "groupLabel": "Quesos", "pending": true}, {"name": "Mayonesa Trufada", "group": "Salsas Y Mayonesas", "peso": 220, "precio": 4, "preciounidad": 0.0181818181818182, "nota": "", "groupLabel": "Salsas y mayonesas", "pending": false}, {"name": "Mayonesa", "group": "Salsas Y Mayonesas", "peso": 10000, "precio": 15.6, "preciounidad": 0.00156, "nota": "", "groupLabel": "Salsas y mayonesas", "pending": false}, {"name": "Salsa Brava", "group": "Salsas Y Mayonesas", "peso": 5000, "precio": 11, "preciounidad": 0.0022, "nota": "Elaboración propia: precio manual de tu escandallo", "groupLabel": "Salsas y mayonesas", "pending": false}, {"name": "Salsa Barbacoa", "group": "Salsas Y Mayonesas", "peso": 900, "precio": 8, "preciounidad": 0.00888888888888889, "nota": "", "groupLabel": "Salsas y mayonesas", "pending": false}, {"name": "Salsa Cesar", "group": "Salsas Y Mayonesas", "peso": 820, "precio": 6.39, "preciounidad": 0.00779268292682927, "nota": "", "groupLabel": "Salsas y mayonesas", "pending": false}, {"name": "Salsa Yogurt", "group": "Salsas Y Mayonesas", "peso": 820, "precio": 6.85, "preciounidad": 0.00835365853658537, "nota": "", "groupLabel": "Salsas y mayonesas", "pending": false}, {"name": "Salsa Ranchera", "group": "Salsas Y Mayonesas", "peso": 1000, "precio": 4, "preciounidad": 0.004, "nota": "", "groupLabel": "Salsas y mayonesas", "pending": false}, {"name": "Salsa cheddar", "group": "Salsas Y Mayonesas", "peso": 1000, "precio": 10.15, "preciounidad": 0.01015, "nota": "", "groupLabel": "Salsas y mayonesas", "pending": false}, {"name": "Salsa Chipotle", "group": "Salsas Y Mayonesas", "peso": 260, "precio": 5.6, "preciounidad": 0.0215384615384615, "nota": "", "groupLabel": "Salsas y mayonesas", "pending": false}, {"name": "Salsa Soja", "group": "Salsas Y Mayonesas", "peso": 1000, "precio": 6, "preciounidad": 0.006, "nota": "", "groupLabel": "Salsas y mayonesas", "pending": false}, {"name": "Winchi", "group": "Salsas Y Mayonesas", "peso": 1000, "precio": 3, "preciounidad": 0.003, "nota": "", "groupLabel": "Salsas y mayonesas", "pending": false}, {"name": "3 Salsas", "group": "Salsas Y Mayonesas", "peso": 1000, "precio": 3, "preciounidad": 0.003, "nota": "", "groupLabel": "Salsas y mayonesas", "pending": false}, {"name": "Alioli", "group": "Salsas Y Mayonesas", "peso": 1000, "precio": 2.8, "preciounidad": 0.0028, "nota": "", "groupLabel": "Salsas y mayonesas", "pending": false}, {"name": "Guacamole", "group": "Salsas Elaboradas (Calculadas)", "peso": 1000, "precio": 6.281, "preciounidad": 0.006281, "nota": "Calculada desde su receta. Precio manual antiguo: 10.00 € por 1000 g", "groupLabel": "Salsas elaboradas", "pending": false}, {"name": "Salsa Bocadito", "group": "Salsas Elaboradas (Calculadas)", "peso": 5000, "precio": 11.0030792, "preciounidad": 0.00220061584, "nota": "Calculada desde su receta. Precio manual antiguo: 10.73 € por 5000 g", "groupLabel": "Salsas elaboradas", "pending": false}, {"name": "Mix Gourmet", "group": "Verduras, Frescos Y Varios", "peso": 500, "precio": 3.5, "preciounidad": 0.007, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Canonigos", "group": "Verduras, Frescos Y Varios", "peso": 200, "precio": 2.1, "preciounidad": 0.0105, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Lechuga", "group": "Verduras, Frescos Y Varios", "peso": 300, "precio": 1.82, "preciounidad": 0.00606666666666667, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Tomates", "group": "Verduras, Frescos Y Varios", "peso": 1000, "precio": 2.8, "preciounidad": 0.0028, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Tomate Cherry", "group": "Verduras, Frescos Y Varios", "peso": 1000, "precio": 4.5, "preciounidad": 0.0045, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Cebolla", "group": "Verduras, Frescos Y Varios", "peso": 1000, "precio": 1.3, "preciounidad": 0.0013, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Pimiento", "group": "Verduras, Frescos Y Varios", "peso": 1000, "precio": 3.5, "preciounidad": 0.0035, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Aguacate", "group": "Verduras, Frescos Y Varios", "peso": 1000, "precio": 6, "preciounidad": 0.006, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Ajo", "group": "Verduras, Frescos Y Varios", "peso": 1000, "precio": 5.5, "preciounidad": 0.0055, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Limon", "group": "Verduras, Frescos Y Varios", "peso": 1000, "precio": 3, "preciounidad": 0.003, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Lima", "group": "Verduras, Frescos Y Varios", "peso": 1000, "precio": 3.5, "preciounidad": 0.0035, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Pimiento Rojo", "group": "Verduras, Frescos Y Varios", "peso": 1000, "precio": 2, "preciounidad": 0.002, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Pimiento Piquillo", "group": "Verduras, Frescos Y Varios", "peso": 1, "precio": 3.25, "preciounidad": 3.25, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Champiñones", "group": "Verduras, Frescos Y Varios", "peso": 1000, "precio": 1.65, "preciounidad": 0.00165, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Huevo", "group": "Verduras, Frescos Y Varios", "peso": 30, "precio": 6.2, "preciounidad": 0.206666666666667, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Cilantro", "group": "Verduras, Frescos Y Varios", "peso": 100, "precio": 1.2, "preciounidad": 0.012, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Perejil", "group": "Verduras, Frescos Y Varios", "peso": 100, "precio": 1, "preciounidad": 0.01, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Nueces", "group": "Verduras, Frescos Y Varios", "peso": 1000, "precio": 10.66, "preciounidad": 0.01066, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Pasas", "group": "Verduras, Frescos Y Varios", "peso": 1000, "precio": 6.4, "preciounidad": 0.0064, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Nachos", "group": "Verduras, Frescos Y Varios", "peso": 100, "precio": 2, "preciounidad": 0.02, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Cebolla Crujiente", "group": "Verduras, Frescos Y Varios", "peso": 500, "precio": 5.15, "preciounidad": 0.0103, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Semillas Amapola", "group": "Verduras, Frescos Y Varios", "peso": 1000, "precio": 3, "preciounidad": 0.003, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Cebolla Caramelizada", "group": "Verduras, Frescos Y Varios", "peso": 10000, "precio": 23, "preciounidad": 0.0023, "nota": "Elaboración propia: precio manual de tu escandallo", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Atun", "group": "Verduras, Frescos Y Varios", "peso": 1000, "precio": 7.11, "preciounidad": 0.00711, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Zanahoria", "group": "Verduras, Frescos Y Varios", "peso": 210, "precio": 0.7, "preciounidad": 0.00333333333333333, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Remolacha", "group": "Verduras, Frescos Y Varios", "peso": 1000, "precio": 2, "preciounidad": 0.002, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "Pepinillos", "group": "Verduras, Frescos Y Varios", "peso": 850, "precio": 4, "preciounidad": 0.00470588235294118, "nota": "", "groupLabel": "Verduras, frescos y varios", "pending": false}, {"name": "ajo negro", "group": "Verduras, Frescos Y Varios", "peso": null, "precio": null, "preciounidad": 0, "nota": "Usado en Burguer buey (versión antigua). Sin precio - pendiente", "groupLabel": "Verduras, frescos y varios", "pending": true}, {"name": "Baguette", "group": "Panes", "peso": 1, "precio": 0.45, "preciounidad": 0.45, "nota": "", "groupLabel": "Panes", "pending": false}, {"name": "Pan Semillas", "group": "Panes", "peso": 1, "precio": 0.55, "preciounidad": 0.55, "nota": "", "groupLabel": "Panes", "pending": false}, {"name": "Pan de molde", "group": "Panes", "peso": 1, "precio": 0.09, "preciounidad": 0.09, "nota": "", "groupLabel": "Panes", "pending": false}, {"name": "Campero", "group": "Panes", "peso": 1, "precio": 0.6, "preciounidad": 0.6, "nota": "", "groupLabel": "Panes", "pending": false}, {"name": "Campero XL", "group": "Panes", "peso": 1, "precio": 0.6, "preciounidad": 0.6, "nota": "Mismo precio que Campero en tu escandallo - confirmar", "groupLabel": "Panes", "pending": false}, {"name": "Roscas", "group": "Panes", "peso": 1, "precio": 0.7, "preciounidad": 0.7, "nota": "", "groupLabel": "Panes", "pending": false}, {"name": "Burguer Brioche", "group": "Panes", "peso": 1, "precio": 0.8, "preciounidad": 0.8, "nota": "", "groupLabel": "Panes", "pending": false}, {"name": "Pan cuadrado", "group": "Panes", "peso": 1000, "precio": 3.2, "preciounidad": 0.0032, "nota": "", "groupLabel": "Panes", "pending": false}, {"name": "Pan mini Burguer", "group": "Panes", "peso": 1, "precio": 0.25, "preciounidad": 0.25, "nota": "No estaba en tu tabla: precio tomado del escandallo anterior - confirmar", "groupLabel": "Panes", "pending": false}, {"name": "Patatas Fritas", "group": "Patatas Y Fritos", "peso": 1000, "precio": 2.65, "preciounidad": 0.00265, "nota": "", "groupLabel": "Patatas y fritos", "pending": false}, {"name": "Patatas Bravas", "group": "Patatas Y Fritos", "peso": 1000, "precio": 2.86, "preciounidad": 0.00286, "nota": "", "groupLabel": "Patatas y fritos", "pending": false}, {"name": "Patatas Deluxe", "group": "Patatas Y Fritos", "peso": 1000, "precio": 3.69, "preciounidad": 0.00369, "nota": "", "groupLabel": "Patatas y fritos", "pending": false}, {"name": "Nuggets", "group": "Patatas Y Fritos", "peso": 1000, "precio": 9.88, "preciounidad": 0.00988, "nota": "", "groupLabel": "Patatas y fritos", "pending": false}, {"name": "Lagrimitas", "group": "Patatas Y Fritos", "peso": 1200, "precio": 11.12, "preciounidad": 0.00926666666666667, "nota": "", "groupLabel": "Patatas y fritos", "pending": false}, {"name": "Alitas", "group": "Patatas Y Fritos", "peso": 1000, "precio": 7.3, "preciounidad": 0.0073, "nota": "", "groupLabel": "Patatas y fritos", "pending": false}, {"name": "Aros de Cebolla", "group": "Patatas Y Fritos", "peso": 1000, "precio": 4.31, "preciounidad": 0.00431, "nota": "", "groupLabel": "Patatas y fritos", "pending": false}, {"name": "Patatas Bolsas", "group": "Patatas Y Fritos", "peso": 1000, "precio": 8, "preciounidad": 0.008, "nota": "", "groupLabel": "Patatas y fritos", "pending": false}, {"name": "Bolsas de asas 48x60", "group": "Envases Y Consumibles", "peso": 120, "precio": 2.84, "preciounidad": 0.0236666666666667, "nota": "", "groupLabel": "Envases y consumibles", "pending": false}, {"name": "Bolsas de asas 42x53", "group": "Envases Y Consumibles", "peso": 200, "precio": 3.13, "preciounidad": 0.01565, "nota": "", "groupLabel": "Envases y consumibles", "pending": false}, {"name": "Bolsas de asas 30x40", "group": "Envases Y Consumibles", "peso": 200, "precio": 3.13, "preciounidad": 0.01565, "nota": "", "groupLabel": "Envases y consumibles", "pending": false}, {"name": "Comanderos", "group": "Envases Y Consumibles", "peso": 5, "precio": 6.84, "preciounidad": 1.368, "nota": "", "groupLabel": "Envases y consumibles", "pending": false}, {"name": "Envase Salsa", "group": "Envases Y Consumibles", "peso": 100, "precio": 2.07, "preciounidad": 0.0207, "nota": "", "groupLabel": "Envases y consumibles", "pending": false}, {"name": "Aluminio Peq", "group": "Envases Y Consumibles", "peso": 1500, "precio": 10.2, "preciounidad": 0.0068, "nota": "", "groupLabel": "Envases y consumibles", "pending": false}, {"name": "Aluminio Grnd", "group": "Envases Y Consumibles", "peso": 2000, "precio": 16, "preciounidad": 0.008, "nota": "", "groupLabel": "Envases y consumibles", "pending": false}, {"name": "Bobina Pack-2", "group": "Envases Y Consumibles", "peso": 2, "precio": 12, "preciounidad": 6, "nota": "", "groupLabel": "Envases y consumibles", "pending": false}, {"name": "Tapa envases Salsa", "group": "Envases Y Consumibles", "peso": 100, "precio": 1.65, "preciounidad": 0.0165, "nota": "", "groupLabel": "Envases y consumibles", "pending": false}, {"name": "Bobina mediana", "group": "Envases Y Consumibles", "peso": 1, "precio": 8.1, "preciounidad": 8.1, "nota": "", "groupLabel": "Envases y consumibles", "pending": false}, {"name": "Mini servi", "group": "Envases Y Consumibles", "peso": 1, "precio": 0.09, "preciounidad": 0.09, "nota": "", "groupLabel": "Envases y consumibles", "pending": false}, {"name": "Tissue", "group": "Envases Y Consumibles", "peso": 1, "precio": 1.49, "preciounidad": 1.49, "nota": "", "groupLabel": "Envases y consumibles", "pending": false}, {"name": "Aceite Girasol", "group": "Aceites, Aliños Y Monodosis", "peso": 25, "precio": 42.35, "preciounidad": 1.694, "nota": "", "groupLabel": "Aceites, aliños y monodosis", "pending": false}, {"name": "Aceite Oliva", "group": "Aceites, Aliños Y Monodosis", "peso": 5, "precio": 26.73, "preciounidad": 5.346, "nota": "", "groupLabel": "Aceites, aliños y monodosis", "pending": false}, {"name": "Vinagre Balsámico", "group": "Aceites, Aliños Y Monodosis", "peso": 5, "precio": 21.35, "preciounidad": 4.27, "nota": "Precio tomado del escandallo anterior (pack 5 botellas) - confirmar", "groupLabel": "Aceites, aliños y monodosis", "pending": false}, {"name": "Monodosis Vinagre", "group": "Aceites, Aliños Y Monodosis", "peso": 240, "precio": 9.48, "preciounidad": 0.0395, "nota": "Precio tomado del escandallo anterior (caja 240 uds) - confirmar", "groupLabel": "Aceites, aliños y monodosis", "pending": false}, {"name": "Monodosis Aceite", "group": "Aceites, Aliños Y Monodosis", "peso": 200, "precio": 15, "preciounidad": 0.075, "nota": "Precio tomado del escandallo anterior (caja 200 uds) - confirmar", "groupLabel": "Aceites, aliños y monodosis", "pending": false}, {"name": "Monodosis Ketchup", "group": "Aceites, Aliños Y Monodosis", "peso": 198, "precio": 13, "preciounidad": 0.0656565656565657, "nota": "", "groupLabel": "Aceites, aliños y monodosis", "pending": false}, {"name": "Monodosis Mayonesa", "group": "Aceites, Aliños Y Monodosis", "peso": 200, "precio": 12.92, "preciounidad": 0.0646, "nota": "", "groupLabel": "Aceites, aliños y monodosis", "pending": false}, {"name": "Monodosis Mostaza", "group": "Aceites, Aliños Y Monodosis", "peso": null, "precio": null, "preciounidad": 0, "nota": "Sin precio en ningún escandallo - pendiente", "groupLabel": "Aceites, aliños y monodosis", "pending": true}, {"name": "Mostaza Dijon", "group": "Aceites, Aliños Y Monodosis", "peso": 1000, "precio": 3.96, "preciounidad": 0.00396, "nota": "Precio tomado del escandallo anterior (bote 1 kg) - confirmar", "groupLabel": "Aceites, aliños y monodosis", "pending": false}, {"name": "Tabasco", "group": "Aceites, Aliños Y Monodosis", "peso": null, "precio": null, "preciounidad": 0, "nota": "Sin precio - pendiente", "groupLabel": "Aceites, aliños y monodosis", "pending": true}, {"name": "Orégano", "group": "Aceites, Aliños Y Monodosis", "peso": null, "precio": null, "preciounidad": 0, "nota": "Sin precio - pendiente", "groupLabel": "Aceites, aliños y monodosis", "pending": true}, {"name": "Tomillo", "group": "Aceites, Aliños Y Monodosis", "peso": null, "precio": null, "preciounidad": 0, "nota": "Sin precio - pendiente", "groupLabel": "Aceites, aliños y monodosis", "pending": true}, {"name": "Miel de Caña", "group": "Aceites, Aliños Y Monodosis", "peso": 1, "precio": 5.48, "preciounidad": 5.48, "nota": "Precio tomado del escandallo anterior (botella) - confirmar", "groupLabel": "Aceites, aliños y monodosis", "pending": false}];
+const ESTR = [{"n": "Cuota Autónomo", "v": 89.0, "pend": true}, {"n": "Alquiler local (Bocadito)", "v": 714.0, "pend": true}, {"n": "Alquiler almacén", "v": 181.44, "pend": true}, {"n": "Luz", "v": 600.0, "pend": true}, {"n": "Agua", "v": 0.0, "pend": true}, {"n": "WiFi", "v": 29.0, "pend": true}, {"n": "Seguro Responsabilidad Civil", "v": 25.0, "pend": true}, {"n": "Cuota mensual moto (reparto)", "v": 50.0, "pend": true}];
+const NOM = [{"n": "Fernández Naranjo, Paula — Ayte. Camarera", "v": 226.79, "d": "Solo 10 días trabajados en mayo (alta 22/05/26)"}, {"n": "Pavón Flores, Lidia — Ayte. Camarera", "v": 1306.8, "d": "Mes completo"}, {"n": "Rodríguez Lozano, Yanira — Ayte. de Cocina", "v": 1004.92, "d": "Mes completo"}, {"n": "Romay Rodríguez, María José — Ayte. Cocina", "v": 521.97, "d": "Mes completo"}, {"n": "Salas González, Guillermo — Repartidor", "v": 514.61, "d": "Mes completo"}, {"n": "Villalobos Palma, José Miguel — Repartidor", "v": 1023.44, "d": "Mes completo"}];
+const FIJOS = {"estructura": 1688.44, "nomina": 4598.53, "total": 6286.969999999999, "volumen": 3000, "imputado": 2.0956566666666663};
+const NEON = ['#b026ff','#39ff88','#ff2b9d','#28e2ff','#ffb020','#ff3b57','#ffd24d','#7c5cff','#20e0a0','#ff7ab8','#63c9ff'];
+
+function fmtEUR(v){ return (v==null?0:v).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; }
+function fmtPct(v){ return ((v||0)*100).toFixed(1)+'%'; }
+function fcColor(fc){ return fc>0.5 ? 'var(--red)' : (fc<0.35 ? 'var(--green)' : 'var(--amber)'); }
+
+/* ---------- navigation ---------- */
+const navBtns = document.querySelectorAll('#nav button, .nav button');
+document.querySelectorAll('.nav button').forEach(btn=>{
+  btn.addEventListener('click', ()=> showView(btn.dataset.view));
+});
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+  window.scrollTo({top:0});
+}
+
+/* ---------- KPIs carta ---------- */
+const overallFc = FOOD.reduce((a,b)=>a+b.fc,0)/FOOD.length;
+const overallGan = FOOD.reduce((a,b)=>a+b.ganp,0)/FOOD.length;
+const alerts = FOOD.filter(f=>f.fc>0.55);
+document.getElementById('kpi-count').textContent = FOOD.length;
+document.getElementById('kpi-gan').textContent = fmtPct(overallGan);
+document.getElementById('kpi-fc').textContent = fmtPct(overallFc);
+document.getElementById('kpi-alert').textContent = alerts.length;
+
+const barsEl = document.getElementById('bars');
+const maxFc = Math.max(...CATSTATS.map(c=>c.avgfc));
+CATSTATS.forEach(c=>{
+  const row = document.createElement('div'); row.className='bar-row';
+  row.innerHTML = `<div class="name">${c.cat}</div>
+    <div class="bar-track"><div class="bar-fill" style="width:0%" data-w="${(c.avgfc/maxFc*100).toFixed(1)}%"></div></div>
+    <div class="pct" style="color:${fcColor(c.avgfc)}">${(c.avgfc*100).toFixed(1)}%</div>`;
+  barsEl.appendChild(row);
+});
+requestAnimationFrame(()=> setTimeout(()=>{
+  document.querySelectorAll('.bar-fill').forEach(b=>{ b.style.width = b.dataset.w; });
+}, 60));
+
+(function buildDonut(){
+  const svg = document.getElementById('donut');
+  const total = CATSTATS.reduce((a,c)=>a+c.n,0);
+  const cx=110, cy=110, r=80, rInner=48;
+  let angle = -Math.PI/2;
+  const legend = document.getElementById('donut-legend');
+  CATSTATS.forEach((c,i)=>{
+    const frac = c.n/total;
+    const a0 = angle, a1 = angle + frac*Math.PI*2; angle = a1;
+    const x0 = cx + r*Math.cos(a0), y0 = cy + r*Math.sin(a0);
+    const x1 = cx + r*Math.cos(a1), y1 = cy + r*Math.sin(a1);
+    const xi0 = cx + rInner*Math.cos(a1), yi0 = cy + rInner*Math.sin(a1);
+    const xi1 = cx + rInner*Math.cos(a0), yi1 = cy + rInner*Math.sin(a0);
+    const large = (a1-a0) > Math.PI ? 1 : 0;
+    const d = `M ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1} L ${xi0} ${yi0} A ${rInner} ${rInner} 0 ${large} 0 ${xi1} ${yi1} Z`;
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', d); path.setAttribute('fill', NEON[i % NEON.length]); path.setAttribute('opacity','0.88');
+    const title = document.createElementNS('http://www.w3.org/2000/svg','title');
+    title.textContent = c.cat + ' — ' + c.n + ' platos';
+    path.appendChild(title);
+    svg.appendChild(path);
+    const li = document.createElement('span');
+    li.innerHTML = `<span class="sw" style="background:${NEON[i % NEON.length]}"></span>${c.cat} (${c.n})`;
+    legend.appendChild(li);
+  });
+  const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+  txt.setAttribute('x', cx); txt.setAttribute('y', cy+6); txt.setAttribute('text-anchor','middle');
+  txt.setAttribute('fill','#f1ecff'); txt.setAttribute('font-size','26'); txt.setAttribute('font-weight','700');
+  txt.textContent = total;
+  svg.appendChild(txt);
+})();
+
+function renderList(el, items, kind){
+  el.innerHTML = '';
+  items.forEach(it=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<div class="nm">${it.name}<span class="cat">${it.catLabel}</span></div>
+      <span class="badge ${kind==='worst'?'bad':'good'}">${fmtPct(it.fc)}</span>`;
+    el.appendChild(li);
+  });
+}
+renderList(document.getElementById('list-worst'), [...FOOD].sort((a,b)=>b.fc-a.fc).slice(0,6), 'worst');
+renderList(document.getElementById('list-best'), [...FOOD].sort((a,b)=>a.fc-b.fc).slice(0,6), 'best');
+
+const cardGrid = document.getElementById('cat-cards');
+CATSTATS.forEach((c,i)=>{
+  const card = document.createElement('button');
+  card.className = 'cat-card';
+  card.innerHTML = `<div class="n">Sección</div><h4>${c.cat}</h4>
+    <div class="stat">Platos <b>${c.n}</b></div>
+    <div class="stat">PVP medio <b>${fmtEUR(c.avgpvp)}</b></div>
+    <div class="stat">Food cost medio <b style="color:${fcColor(c.avgfc)}">${fmtPct(c.avgfc)}</b></div>
+    <div class="fcbar"><i style="width:${(c.avgfc*100).toFixed(1)}%; background:${NEON[i % NEON.length]}"></i></div>`;
+  card.addEventListener('click', ()=>{
+    showView('grimorio');
+    document.getElementById('filter-cat').value = c.cat;
+    renderTable();
+  });
+  cardGrid.appendChild(card);
+});
+
+const tbody = document.getElementById('tbody');
+const catSel = document.getElementById('filter-cat');
+const catNames = [...new Set(FOOD.map(f=>f.catLabel))];
+catSel.innerHTML = '<option value="">Todas las secciones</option>' + catNames.map(c=>`<option value="${c}">${c}</option>`).join('');
+let sortKey = 'fc', sortDir = -1;
+function renderTable(){
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const cat = catSel.value;
+  let rows = FOOD.filter(f => (!cat || f.catLabel===cat) && (!q || f.name.toLowerCase().includes(q)));
+  rows.sort((a,b)=> (a[sortKey] > b[sortKey] ? 1 : -1) * sortDir);
+  tbody.innerHTML = rows.map(r => `
+    <tr><td><span class="chip">${r.catLabel}</span></td><td>${r.name}</td>
+      <td class="num">${fmtEUR(r.pvp)}</td><td class="num">${fmtEUR(r.coste)}</td>
+      <td class="num"><span class="fc-dot" style="background:${fcColor(r.fc)}"></span><span style="color:${fcColor(r.fc)}">${fmtPct(r.fc)}</span></td>
+      <td class="num">${fmtPct(r.ganp)}</td></tr>`).join('');
+}
+document.getElementById('search').addEventListener('input', renderTable);
+catSel.addEventListener('change', renderTable);
+document.querySelectorAll('#view-grimorio th[data-k]').forEach(th=>{
+  th.addEventListener('click', ()=>{
+    const k = th.dataset.k; sortDir = (sortKey===k) ? -sortDir : -1; sortKey = k; renderTable();
+  });
+});
+renderTable();
+
+document.getElementById('tbody-bev').innerHTML = BEV.map(b => `
+  <tr><td>${b.name}</td><td class="num">${fmtEUR(b.pvp)}</td><td class="num pending">pendiente</td></tr>`).join('');
+
+/* ---------- productos (despensa) ---------- */
+document.getElementById('kpi-prod-count').textContent = ING.length;
+document.getElementById('kpi-prod-pend').textContent = ING.filter(i=>i.pending).length;
+document.getElementById('kpi-prod-groups').textContent = new Set(ING.map(i=>i.groupLabel)).size;
+const tbodyProd = document.getElementById('tbody-prod');
+const groupSel = document.getElementById('filter-group');
+const groupNames = [...new Set(ING.map(i=>i.groupLabel))];
+groupSel.innerHTML = '<option value="">Todos los grupos</option>' + groupNames.map(g=>`<option value="${g}">${g}</option>`).join('');
+let prodSortKey = 'groupLabel', prodSortDir = 1;
+function renderProd(){
+  const q = document.getElementById('search-prod').value.trim().toLowerCase();
+  const g = groupSel.value;
+  let rows = ING.filter(i => (!g || i.groupLabel===g) && (!q || i.name.toLowerCase().includes(q)));
+  rows.sort((a,b)=>{
+    const av = a[prodSortKey], bv = b[prodSortKey];
+    return (av > bv ? 1 : (av < bv ? -1 : 0)) * prodSortDir;
+  });
+  tbodyProd.innerHTML = rows.map(i => `
+    <tr><td><span class="chip">${i.groupLabel}</span></td><td>${i.name}</td>
+      <td class="num">${i.pending ? '<span class="pending">pendiente</span>' : i.peso}</td>
+      <td class="num">${i.pending ? '<span class="pending">pendiente</span>' : fmtEUR(i.precio)}</td>
+      <td class="num">${i.pending ? '—' : (i.preciounidad||0).toFixed(5)+' €'}</td></tr>`).join('');
+}
+document.getElementById('search-prod').addEventListener('input', renderProd);
+groupSel.addEventListener('change', renderProd);
+document.querySelectorAll('#view-productos th[data-k]').forEach(th=>{
+  th.addEventListener('click', ()=>{
+    const k = th.dataset.k; prodSortDir = (prodSortKey===k) ? -prodSortDir : 1; prodSortKey = k; renderProd();
+  });
+});
+renderProd();
+
+/* ---------- costes fijos ---------- */
+document.getElementById('kpi-estructura').textContent = fmtEUR(FIJOS.estructura);
+document.getElementById('kpi-nomina').textContent = fmtEUR(FIJOS.nomina);
+document.getElementById('kpi-total-fijos').textContent = fmtEUR(FIJOS.total);
+document.getElementById('kpi-imputado').textContent = fmtEUR(FIJOS.imputado);
+document.getElementById('kpi-volumen').textContent = FIJOS.volumen;
+document.getElementById('total-estructura').textContent = fmtEUR(FIJOS.estructura);
+document.getElementById('total-nomina').textContent = fmtEUR(FIJOS.nomina);
+document.getElementById('list-estructura').innerHTML = ESTR.map(e => `
+  <div class="mini-row"><span>${e.n}${e.pend?' <span class="pending">(pendiente)</span>':''}</span><b>${fmtEUR(e.v)}</b></div>`).join('');
+document.getElementById('list-nomina').innerHTML = NOM.map(n => `
+  <div class="mini-row"><span>${n.n}<span class="d">${n.d}</span></span><b>${fmtEUR(n.v)}</b></div>`).join('');
+
+/* ---------- CAJA: live via Google Drive (mcp capability) ---------- */
+const CAJA_FILE_ID = '1Hex_7VVhdmv0H5ZPV9xG2sp3DG3Er7gUkcp30YwDuiA';
+
+function parseEUR(s){
+  if (s == null) return 0;
+  const n = String(s).replace(/\s|€/g,'').replace(/\\-/g,'-').replace(/\./g,'').replace(',', '.');
+  const v = parseFloat(n);
+  return isNaN(v) ? 0 : v;
+}
+function parseFechaDMY(s){
+  const m = /(\d{2})\/(\d{2})\/(\d{4})/.exec(s||'');
+  if (!m) return null;
+  return new Date(+m[3], +m[2]-1, +m[1]);
+}
+function unescapeMd(s){
+  return (s||'').replace(/\\(.)/g, '$1').trim();
+}
+function parseCierresTable(fileContent){
+  const lines = (fileContent||'').split('\n').filter(l => l.trim().startsWith('|'));
+  if (lines.length < 2) return [];
+  const cellsOf = l => l.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(unescapeMd);
+  const header = cellsOf(lines[0]);
+  const rows = [];
+  for (let i = 1; i < lines.length; i++){
+    const cells = cellsOf(lines[i]);
+    if (cells.every(c => /^:?-+:?$/.test(c))) continue; // markdown separator row
+    if (cells.length < 2 || !cells[0]) continue;
+    const row = {};
+    header.forEach((h, idx) => { row[h] = cells[idx]; });
+    rows.push(row);
+  }
+  return rows;
+}
+
+function setCajaStatus(kind, text){
+  const dot = document.getElementById('caja-dot');
+  const t = document.getElementById('caja-status-text');
+  const tag = document.getElementById('caja-live-tag');
+  dot.className = 'live-dot' + (kind ? ' ' + kind : '');
+  t.textContent = text;
+  if (tag){
+    tag.textContent = kind === 'ok' ? '●live' : (kind === 'warn' ? '●...' : '●off');
+    tag.className = 'tag' + (kind === 'ok' ? ' tag-live' : '');
+  }
+}
+function cajaBanner(kind, html){
+  document.getElementById('caja-banner').innerHTML = html ? `<div class="caja-alert-banner ${kind}">${html}</div>` : '';
+}
+
+function renderCaja(rows){
+  const banner = document.getElementById('caja-banner');
+  document.getElementById('caja-tbody').innerHTML = '';
+  if (!rows.length){
+    document.getElementById('caja-tbody').innerHTML = '<tr><td colspan="8" style="color:var(--ink-dim); text-align:center;">Todavía no hay cierres registrados.</td></tr>';
+    document.getElementById('caja-kpi-n').textContent = '0';
+    document.getElementById('caja-kpi-fact').textContent = '0,00 €';
+    document.getElementById('caja-kpi-ticket').textContent = '0,00 €';
+    document.getElementById('caja-kpi-ultimo').textContent = '—';
+    return;
+  }
+  rows.sort((a,b) => (parseFechaDMY(a['Fecha cierre']) || 0) - (parseFechaDMY(b['Fecha cierre']) || 0));
+
+  const factVals = rows.map(r => parseEUR(r['Facturación total (€)']));
+  const totalFact = factVals.reduce((a,b)=>a+b, 0);
+  const totalTickets = rows.reduce((a,r) => a + (parseInt(r['Nº tickets'])||0), 0);
+  const ticketMedio = totalTickets ? totalFact/totalTickets : 0;
+  const last = rows[rows.length-1];
+
+  document.getElementById('caja-kpi-n').textContent = rows.length;
+  document.getElementById('caja-kpi-fact').textContent = fmtEUR(totalFact);
+  document.getElementById('caja-kpi-ticket').textContent = fmtEUR(ticketMedio);
+  document.getElementById('caja-kpi-ultimo').textContent = (last['Fecha cierre']||'—');
+  document.getElementById('caja-kpi-ultimo-sub').textContent = 'facturó ' + fmtEUR(parseEUR(last['Facturación total (€)']));
+
+  document.getElementById('caja-tbody').innerHTML = rows.slice().reverse().map(r => {
+    const descuadre = parseEUR(r['Descuadre total (€)']);
+    return `<tr>
+      <td>${r['Fecha cierre']||''}</td><td>${r['ID arqueo']||''}</td>
+      <td class="num">${r['Facturación total (€)']||''}</td><td class="num">${r['Nº tickets']||''}</td>
+      <td class="num">${r['Ticket medio (€)']||''}</td><td class="num">${r['Efectivo cobrado (€)']||''}</td>
+      <td class="num">${r['Tarjeta cobrado (€)']||''}</td>
+      <td class="num" style="color:${Math.abs(descuadre)>0.01?'var(--red)':'var(--green)'}">${r['Descuadre total (€)']||''}</td>
+    </tr>`;
+  }).join('');
+
+  const barsEl = document.getElementById('caja-bars');
+  const emptyEl = document.getElementById('caja-empty');
+  barsEl.innerHTML = '';
+  if (rows.length < 2){
+    emptyEl.style.display = 'block';
+  } else {
+    emptyEl.style.display = 'none';
+    const maxFact = Math.max(...factVals, 1);
+    rows.forEach(r => {
+      const v = parseEUR(r['Facturación total (€)']);
+      const desc = Math.abs(parseEUR(r['Descuadre total (€)'])) > 0.01;
+      const row = document.createElement('div'); row.className = 'cbar-row';
+      row.innerHTML = `<div class="d">${r['Fecha cierre']||''}</div>
+        <div class="cbar-track"><div class="cbar-fill${desc?' desc':''}" style="width:${(v/maxFact*100).toFixed(1)}%"></div></div>
+        <div class="v">${fmtEUR(v)}</div>`;
+      barsEl.appendChild(row);
+    });
+  }
+}
+
+async function initCaja(){
+  let mcp;
+  try {
+    mcp = await claude.use('mcp');
+  } catch (e) {
+    setCajaStatus('err', 'Conexión en vivo no disponible aquí');
+    cajaBanner('err', 'Esta sección solo funciona dentro de un artifact publicado en claude.ai. Si estás viendo esto en GitHub Pages o en otro sitio, los cierres de caja en vivo no van a cargar — el resto del panel sí funciona igual.');
+    document.getElementById('caja-tbody').innerHTML = '<tr><td colspan="8" style="color:var(--ink-dim); text-align:center;">No disponible fuera de claude.ai</td></tr>';
+    return;
+  }
+  if (!mcp){
+    setCajaStatus('err', 'Sin conexión a Drive en esta vista');
+    cajaBanner('err', 'Esta vista no puede usar conectores ahora mismo. Ábrela en claude.ai para ver los cierres en vivo.');
+    return;
+  }
+  setCajaStatus('warn', 'Conectando con Google Drive...');
+  mcp.watchTool('Google Drive', 'read_file_content', { fileId: CAJA_FILE_ID }, (ev) => {
+    if (ev.type === 'error'){
+      const code = ev.error.code;
+      if (code === 'needs_reauth'){
+        setCajaStatus('err', 'Hay que reconectar Google Drive');
+        cajaBanner('err', 'Tu conexión con Google Drive caducó. Reconéctala en <b>claude.ai → Configuración → Conectores</b> y esta sección se reactiva sola.');
+      } else if (code === 'server_not_connected'){
+        setCajaStatus('err', 'Google Drive no está conectado');
+        cajaBanner('err', 'Conecta <b>Google Drive</b> en claude.ai → Configuración → Conectores para ver los cierres en vivo aquí.');
+      } else if (code === 'selection_required'){
+        setCajaStatus('warn', 'Elige una cuenta de Google Drive');
+        cajaBanner('warn', 'Tienes más de una cuenta de Google Drive conectada — elige una desde el aviso de arriba de la página.');
+      } else if (code === 'consent_required' || code === 'not_in_manifest'){
+        setCajaStatus('warn', 'Falta tu permiso para leer Drive');
+        cajaBanner('warn', 'Esta página necesita tu permiso para leer el archivo de cierres. Vuelve a intentarlo y acepta el aviso de Google Drive.');
+      } else if (code === 'blocked_by_policy' || code === 'approval_required'){
+        setCajaStatus('err', 'Bloqueado por la organización');
+        cajaBanner('err', 'Tu organización bloquea el acceso a este archivo desde aquí.');
+      } else if (code === 'server_unavailable' || code === 'upstream_error'){
+        setCajaStatus('warn', 'Drive no responde, reintentando...');
+      } else {
+        setCajaStatus('err', 'No se pudo leer el archivo');
+        cajaBanner('err', 'No he podido leer el archivo de cierres (' + code + '). Vuelve a intentarlo más tarde.');
+      }
+      return;
+    }
+    cajaBanner('', '');
+    const payload = ev.result.payload || {};
+    const rows = parseCierresTable(payload.fileContent || '');
+    renderCaja(rows);
+    const when = ev.result.cache && ev.result.cache.storedAt ? new Date(ev.result.cache.storedAt) : new Date();
+    setCajaStatus('ok', 'En vivo — última lectura ' + when.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'}));
+  }, { refetchInterval: 60000 });
+}
+initCaja();
+</script>
+</body>
+</html>
